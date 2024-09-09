@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application de Trame sur Image</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/fc4b5d19b2.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 40px;
+      height: 100vh;
+      margin: 0;
+      font-family: "Quicksand", sans-serif;
+      background: linear-gradient(145deg, #f2f2f7, #ffffff);
+      color: #1c1c1e;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      gap: 40px;
+      padding: 40px;
+      margin: auto;
+      background-color: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 90vw; /* Occupation de 90% de la largeur de la fenêtre */
+      max-width: auto;
+      box-sizing: border-box;
+    }
+
+    #controls {
+      
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      width: 320px;
+    }
+
+  
+
+    canvas {
+      border: 1px solid #e5e5ea;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 60vw;
+      height: auto;
+    }
+
+    button {
+      font-family: "Quicksand", sans-serif;
+      padding: 12px;
+      margin-top: 10px;
+      background-color: #000000;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 2rem;
+      font-weight: 500;
+      font-size: 14px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #464646;
+      transform: scale(1.04);
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 0.1rem;
+    }
+
+    label #spacingValue, #dotSizeValue {
+      background-color: rgba(247, 171, 121, 0.397);
+      color: rgb(239, 90, 26);
+      padding: 5px 10px;
+      border-radius: 2rem;
+    }
+
+    
+
+    input[type="range"], input[type="color"], select {
+      width: 100%;
+      padding: 6px;
+      border-radius: 8px;
+      appearance: none;
+      outline: none;
+    }
+
+    input[type="color"] {
+  background: #ebebf6;
+  border: none;
+  padding: 8px;
+  border-radius: 2rem;
+  cursor: pointer;
+  -webkit-appearance: none; /* Supprime l'apparence par défaut sur WebKit */
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 2rem; /* Arrondi du conteneur */
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: 1px solid #000; /* Bordure du rectangle de couleur */
+  border-radius: 2rem; /* Arrondi du rectangle de couleur */
+}
+
+    input[type="file"] {
+      background-color: #f2f2f7;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      border: 1px solid #d1d1d6;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+  background: #ebebf6;
+  border-radius: 10px;
+  height: 10px; /* Ajoutez cette ligne pour définir la hauteur de la barre */
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  background: #000000;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  appearance: none;
+  margin-top: -5px; /* Ajuster le curseur vers le haut pour le centrer */
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+    .custom-file-upload {
+  display: block;
+  padding: 8px 12px;
+  margin-top: 10px;
+  cursor: pointer;
+  background-color: #000000;
+  color: white;
+  border-radius: 2rem;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  text-align: center;
+}
+
+.custom-file-upload:hover {
+  background-color: #464646;
+  transform: scale(1.04);
+}
+/* Style de la ligne de points */
+.dots-line {
+  position: relative;
+  margin-top: 1rem;
+  bottom: 0; /* Position juste en dessous du container */
+  width: 100vw; /* Largeur de toute la fenêtre */
+  height: 20px; /* Hauteur de la ligne */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  gap: 5px; /* Espace entre les points */
+  padding: 10px 0;
+}
+
+/* Style des points */
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #1c1c1e;
+  border-radius: 50%;
+  opacity: 0.3; /* Opacité de base des points */
+  animation: fadeOpacity 1.5s infinite ease-in-out, wave 2s infinite ease-in-out;
+}
+
+/* Animation d'opacité */
+@keyframes fadeOpacity {
+  0%, 100% {
+    opacity: 0.3; /* Opacité faible */
+  }
+  50% {
+    opacity: 1; /* Opacité normale */
+  }
+}
+
+/* Animation de vague */
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0); /* Position initiale */
+  }
+  50% {
+    transform: translateY(-5px); /* Monte légèrement pour l'effet de vague */
+  }
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10px; /* Ajustez selon vos besoins */
+  margin-top: -10px;
+  margin-bottom: 10px;
+  position: relative; /* Nécessaire pour le positionnement absolu du tooltip */
+}
+
+.logo-container {
+  position: relative; /* Nécessaire pour positionner le tooltip par rapport à l'image */
+}
+
+nav img {
+  height: 2rem;
+  width: auto;
+  margin-top: -40px;
+  display: inline-block;
+  transition: transform 0.3s ease; /* Animation fluide pour la transformation */
+}
+
+nav img:hover {
+  transform: rotate(-5deg) scale(1.1) translateX(-10px); /* Rotation de 30° et agrandissement de 10% */
+}
+
+
+.tooltip {
+  visibility: hidden; /* Masquer le tooltip par défaut */
+  width: 200px; /* Ajustez la largeur selon vos besoins */
+  background-color: #ffffff;
+  color: #000000;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  text-align: left;
+  border-radius: 10px;
+  padding: 1rem;
+  position: absolute;
+  top: 100%;
+  left: 90%; /* Positionne le tooltip juste à droite de l'image */
+  margin-left: 10px; /* Espacement entre l'image et le tooltip */
+  margin-top: 30px;
+  transform: translateY(-50%); /* Centre verticalement par rapport à l'image */
+  z-index: 1; /* Assure que le tooltip est au-dessus des autres éléments */
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.logo-container:hover .tooltip {
+  visibility: visible; /* Affiche le tooltip au survol */
+}
+
+.logo-container .trame{
+  color: rgb(239, 90, 26);
+}
+
+
+
+
+    /* Media Queries pour les tablettes et mobiles */
+
+    @media (max-width: 1119px){
+      .container {
+        flex-direction: column; /* Empiler les éléments en colonne sur petits écrans */
+        align-items: center;
+        width: 90vw;
+        padding: 20px;
+        margin: auto;
+      }
+
+      #controls {
+        width: 90%; /* Réduire la largeur des contrôles */
+        order: 2; /* Afficher la section des réglages en dessous */
+      }
+
+      canvas {
+        width: 90%; /* Réduire la taille du canvas pour s'adapter à la largeur de l'écran */
+        order: 1; /* Afficher l'image en premier */
+      }
+    }
+
+
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column; /* Empiler les éléments en colonne sur petits écrans */
+        align-items: center;
+        width: 90vw;
+        padding: 20px;
+        margin: auto;
+      }
+
+      #controls {
+        width: 90%; /* Réduire la largeur des contrôles */
+        order: 2; /* Afficher la section des réglages en dessous */
+      }
+
+      canvas {
+        width: 90%; /* Réduire la taille du canvas pour s'adapter à la largeur de l'écran */
+        order: 1; /* Afficher l'image en premier */
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-top: 20px; /* Moins d'espace en haut sur les petits écrans */
+      }
+
+      .container {
+        gap: 20px;
+        width: 90vw;
+        padding: 20px;
+        margin: auto;
+      }
+
+      #controls {
+        width: 100%; /* Occupe tout l'espace sur mobiles */
+        padding: 0;
+        order: 2; /* Section des réglages en dessous */
+      }
+
+      canvas {
+        width: 90%; /* Canvas prend toute la largeur */
+        order: 1; /* Image en premier */
+      }
+
+      button {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      input[type="file"], input[type="range"], input[type="color"], select {
+        font-size: 12px; /* Taille réduite pour les petits écrans */
+      }
+
+      #astuce {
+        font-size: 0.75rem;
+      }
+
+      nav{
+        margin-top: 10px;;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding-top: 10px; /* Réduire encore l'espace */
+      }
+
+      .container {
+        gap: 10px;
+        padding: 10px;
+      }
+
+      button {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      label, #astuce {
+        font-size: 12px;
+      }
+
+      #controls {
+        width: 100%;
+        order: 2; /* Section des réglages en dessous */
+      }
+
+      canvas {
+        width: 100%;
+        order: 1; /* Image en premier */
+      }
+      nav{
+        margin-top: 10px;;
+      }
+    }
+  </style>
+</head>
+
+<nav>
+  <div class="logo-container">
+    <img src="logo.svg" alt="Logo" id="logo">
+    <div class="tooltip"><b class="trame">*Trame</b><br>French word: halftone screen or dot pattern <br> used in printing <a href="https://en.wikipedia.org/wiki/Halftone">to reproduce images.</a></div>
+  </div>
+</nav>
+
+<body>
+  <div class="container">
+    <!-- Formulaire des contrôles -->
+    <div id="controls">
+      <div id="control">
+        <label for="upload">1) Upload an image :</label>
+        <label for="upload" class="custom-file-upload">Choose a file  <i class="fa-regular fa-file-image"></i></label>
+        <input type="file" id="upload" style="display: none;">
+      </div>
+
+      <label for="dotSize">2) Adjust the dots size: <span id="dotSizeValue">10</span></label>
+      <input type="range" id="dotSize" min="1" max="20" value="10"> <!-- Valeur par défaut modifiée -->
+      
+      <label for="spacing">3) Adjust the dots spacing : <span id="spacingValue">5</span></label>
+      <input type="range" id="spacing" min="5" max="50" value="5"> <!-- Valeur par défaut modifiée -->
+      
+
+      <label for="color">4) Choose a color !</label>
+      <input type="color" id="color" value="#000000">
+
+      <label for="shape">5) Change the shape of the dots:</label>
+      <select id="shape">
+        <option value="circle">Circles</option>
+        <option value="square">Squares</option>
+    </select>
+    
+    
+      <button id="downloadImage">Download your masterpiece  <i class="fa-solid fa-file-arrow-down"></i></button>
+
+    </div>
+
+    <!-- Canvas pour afficher l'image -->
+    <canvas id="canvas"></canvas>
+  </div>
+ 
+<!-- Ligne de points animés -->
+<div class="dots-line"></div>
+
+
+
+
+  <script src="script.js"></script>
+</body>
+</html>
